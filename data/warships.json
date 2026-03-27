@@ -1,0 +1,379 @@
+{
+  "metadata": {
+    "title": "Eastern Mediterranean Warship Deployment - March 2026",
+    "context": "NATO and allied warships deployed around Cyprus following Iran-Israel-US conflict escalation beginning 28 February 2026",
+    "data_sources": [
+      "VesselFinder AIS API",
+      "DataDocked Vessel Location API",
+      "itamilradar.com OSINT",
+      "MarineVesselTraffic.com",
+      "ShipSpotting.com",
+      "Open source news reporting (Cyprus Mail, Greek Reporter, Army Recognition)"
+    ],
+    "collected": "2026-03-27",
+    "author": "OSINT research compilation",
+    "bounding_box_cyprus": {
+      "lat_min": 34.0,
+      "lat_max": 36.0,
+      "lon_min": 32.0,
+      "lon_max": 35.5
+    },
+    "bounding_box_wide": {
+      "lat_min": 33.5,
+      "lat_max": 36.5,
+      "lon_min": 31.0,
+      "lon_max": 36.5
+    },
+    "mmsi_watchlist": "227999300,228711555,225920870,244942000,211921000,235053408,338803000,338847000,237780180"
+  },
+  "vessels": [
+    {
+      "name": "FS Languedoc",
+      "hull_number": "D653",
+      "flag": "France",
+      "flag_emoji": "🇫🇷",
+      "class": "Aquitaine (FREMM ASW)",
+      "type": "Frigate",
+      "mmsi": "227999300",
+      "imo": "0",
+      "callsign": "-",
+      "ais_name": "FRENCH_WARSHIP",
+      "ais_status": "stale",
+      "last_ais": {
+        "latitude": 43.0439,
+        "longitude": 5.9569101,
+        "timestamp": "2025-10-15T11:19:00Z",
+        "speed_kn": 5,
+        "course": 200,
+        "heading": null,
+        "draught_m": 3.5,
+        "nav_status": "Underway using Engine",
+        "destination": "NOT DEFINED",
+        "last_port": "Brest France",
+        "last_port_locode": "FRBES",
+        "data_source": "Terrestrial"
+      },
+      "osint_assessment": {
+        "deployed_to": "Cyprus area",
+        "reported_by": "itamilradar.com, Cyprus Mail",
+        "role": "ASW screening, air defence (Aster 15)",
+        "notes": "Stale AIS last in Toulon. OSINT confirms operating near Cyprus since early March 2026."
+      }
+    },
+    {
+      "name": "Charles de Gaulle",
+      "hull_number": "R91",
+      "flag": "France",
+      "flag_emoji": "🇫🇷",
+      "class": "Charles de Gaulle-class Nuclear CVN",
+      "type": "Aircraft Carrier",
+      "mmsi": "228711555",
+      "imo": "1112234",
+      "callsign": "R91",
+      "ais_name": "COALITION WARSHIP",
+      "ais_status": "stale",
+      "last_ais": {
+        "latitude": 43.11372,
+        "longitude": 5.902113,
+        "timestamp": "2018-08-01T11:08:00Z",
+        "speed_kn": 0,
+        "course": null,
+        "heading": null,
+        "draught_m": null,
+        "nav_status": null,
+        "destination": "Toulon France",
+        "last_port": "Toulon France",
+        "last_port_locode": "FRTLN",
+        "data_source": "Terrestrial"
+      },
+      "osint_assessment": {
+        "deployed_to": "Levant / Eastern Mediterranean",
+        "reported_by": "itamilradar.com, French MoD, Greek City Times",
+        "role": "CSG flagship, Rafale M strike/air superiority, E-2C AEW",
+        "notes": "Last AIS from 2018 — carrier has been AIS-dark for years. French MoD confirmed deployment to E. Med with full CSG."
+      }
+    },
+    {
+      "name": "SPS Cristóbal Colón",
+      "hull_number": "F-105",
+      "flag": "Spain",
+      "flag_emoji": "🇪🇸",
+      "class": "Álvaro de Bazán (F100 Aegis)",
+      "type": "Air-defence Frigate",
+      "mmsi": "225920870",
+      "imo": "0",
+      "callsign": "EBDE",
+      "ais_name": null,
+      "ais_status": "dark",
+      "last_ais": null,
+      "osint_assessment": {
+        "deployed_to": "Eastern Mediterranean, CdG CSG escort",
+        "reported_by": "itamilradar.com, Spanish MoD, Wikipedia",
+        "role": "Aegis air-defence (SPY-1D + SM-2), CSG escort",
+        "notes": "Spain announced deployment in early March 2026. No recent AIS captured."
+      }
+    },
+    {
+      "name": "ITS Federico Martinengo",
+      "hull_number": "F596",
+      "flag": "Italy",
+      "flag_emoji": "🇮🇹",
+      "class": "Carlo Bergamini (FREMM GP)",
+      "type": "Frigate",
+      "mmsi": "UNKNOWN",
+      "mmsi_note": "MMSI 247364500 belongs to ITS Luigi Rizzo (F595), NOT Martinengo. Cross-referenced via MarineTraffic, ShipSpotting (IMO 4568933 = Rizzo), MarinevesselTraffic.",
+      "imo": "4714049",
+      "callsign": null,
+      "ais_name": null,
+      "ais_status": "dark",
+      "misattributed_mmsi": {
+        "mmsi": "247364500",
+        "actual_vessel": "ITS Luigi Rizzo (F595)",
+        "actual_imo": "4568933",
+        "source": "DataDocked API returned 'NAVE LUIGI RIZZO' for this MMSI",
+        "last_position": {
+          "latitude": 36.397758,
+          "longitude": -6.5834384,
+          "timestamp": "2022-06-17T10:11:00Z",
+          "speed_kn": 17.3,
+          "last_port": "La Spezia Italy"
+        }
+      },
+      "osint_assessment": {
+        "deployed_to": "Cypriot waters",
+        "reported_by": "Cyprus Mail (Mar 11, 2026), itamilradar.com",
+        "role": "GP frigate, Aster 15/30 + MFRA AESA radar",
+        "notes": "Arrived Cypriot waters around Mar 11 with 160+ crew. Previously deployed to Red Sea under EU Op Aspides."
+      }
+    },
+    {
+      "name": "HNLMS Evertsen",
+      "hull_number": "F805",
+      "flag": "Netherlands",
+      "flag_emoji": "🇳🇱",
+      "class": "De Zeven Provinciën LCF",
+      "type": "Air-defence/Command Frigate",
+      "mmsi": "244942000",
+      "imo": "4601022",
+      "callsign": "PAEU",
+      "ais_name": "HNLMS_EVERTSEN",
+      "ais_status": "live",
+      "last_ais": {
+        "latitude": 35.500168,
+        "longitude": 24.192955,
+        "timestamp": "2026-03-27T15:05:00Z",
+        "speed_kn": 6.1,
+        "course": 33,
+        "heading": 30,
+        "draught_m": 1.1,
+        "nav_status": "Underway using Engine",
+        "destination": "9",
+        "last_port": "Valletta Malta",
+        "last_port_locode": "MTMLA",
+        "atd": "2026-03-09T14:30:00Z",
+        "data_source": "Terrestrial"
+      },
+      "osint_assessment": {
+        "deployed_to": "Off Crete / CdG CSG screen",
+        "reported_by": "itamilradar.com, Cyprus Mail",
+        "role": "Air-defence screen for Charles de Gaulle CSG, SMART-L + APAR radars",
+        "notes": "Only AIS-broadcasting warship with recent position near theatre. Located off Crete, likely screening western approaches. Departed Valletta Mar 9."
+      }
+    },
+    {
+      "name": "HNLMS De Zeven Provinciën",
+      "hull_number": "F802",
+      "flag": "Netherlands",
+      "flag_emoji": "🇳🇱",
+      "class": "De Zeven Provinciën LCF",
+      "type": "Air-defence/Command Frigate",
+      "mmsi": "244911000",
+      "imo": "4600999",
+      "callsign": "PAEQ",
+      "ais_name": "NL_WARSHIP_F802",
+      "ais_status": "stale",
+      "last_ais": {
+        "latitude": 59.252468,
+        "longitude": 19.733866,
+        "timestamp": "2025-11-02T11:08:00Z",
+        "speed_kn": 18.5,
+        "course": 85,
+        "heading": 85,
+        "draught_m": 7.2,
+        "nav_status": "Underway",
+        "destination": "Den helder anch Netherlands",
+        "last_port": "Den helder Netherlands",
+        "last_port_locode": "NLDHR",
+        "data_source": "Terrestrial"
+      },
+      "osint_assessment": {
+        "deployed_to": "NOT deployed to Cyprus",
+        "reported_by": "AIS data analysis",
+        "role": "N/A for Cyprus deployment",
+        "notes": "Last AIS in Baltic Sea (Nov 2025). Likely confused with sister ship Evertsen (F805) in some infographics. Same De Zeven Provinciën class but different hull."
+      }
+    },
+    {
+      "name": "FGS Nordrhein-Westfalen",
+      "hull_number": "F223",
+      "flag": "Germany",
+      "flag_emoji": "🇩🇪",
+      "class": "Baden-Württemberg",
+      "type": "Frigate",
+      "mmsi": "211921000",
+      "imo": "0",
+      "callsign": null,
+      "ais_name": null,
+      "ais_status": "dark",
+      "last_ais": null,
+      "osint_assessment": {
+        "deployed_to": "Off Lebanon (UNIFIL MTF)",
+        "reported_by": "itamilradar.com",
+        "role": "UNIFIL maritime task force — monitoring weapons smuggling, supporting Lebanese Navy",
+        "notes": "Not directly tasked with Cyprus defence but operating in adjacent waters. 7,200t displacement — largest NATO frigate class."
+      }
+    },
+    {
+      "name": "HMS Dragon",
+      "hull_number": "D35",
+      "flag": "United Kingdom",
+      "flag_emoji": "🇬🇧",
+      "class": "Type 45 Daring",
+      "type": "Air-defence Destroyer",
+      "mmsi": "235053408",
+      "imo": "4907866",
+      "callsign": null,
+      "ais_name": null,
+      "ais_status": "dark",
+      "last_ais": null,
+      "osint_assessment": {
+        "deployed_to": "En route to Cyprus",
+        "reported_by": "itamilradar.com infographic",
+        "role": "Area air-defence (SAMPSON AESA + Sea Viper / Aster 30)",
+        "notes": "Type 45 is the Royal Navy's most capable air-defence platform. SAMPSON radar can track hundreds of targets simultaneously."
+      }
+    },
+    {
+      "name": "USS Gerald R. Ford",
+      "hull_number": "CVN-78",
+      "flag": "United States",
+      "flag_emoji": "🇺🇸",
+      "class": "Ford-class",
+      "type": "Nuclear Aircraft Carrier",
+      "mmsi": "338803000",
+      "imo": "0",
+      "callsign": "-",
+      "ais_name": "US_GOVT_VESSEL",
+      "ais_status": "stale",
+      "last_ais": {
+        "latitude": 33.652843,
+        "longitude": -12.003232,
+        "timestamp": "2026-02-18T13:56:00Z",
+        "speed_kn": 18.2,
+        "course": 25,
+        "heading": null,
+        "draught_m": 12.1,
+        "nav_status": null,
+        "destination": "Norfolk USA",
+        "last_port": "Marseille France",
+        "last_port_locode": "FRMRS",
+        "data_source": "Terrestrial"
+      },
+      "osint_assessment": {
+        "deployed_to": "Eastern Mediterranean (assessed)",
+        "reported_by": "itamilradar.com, USNI News",
+        "role": "CSG flagship — anti-Iran ops, Israel defence, air superiority",
+        "notes": "Last AIS off Morocco (Feb 18) heading NE. Almost certainly now in E. Med. Ford CSG includes Aegis destroyers for BMD umbrella."
+      }
+    },
+    {
+      "name": "USS Oscar Austin",
+      "hull_number": "DDG-79",
+      "flag": "United States",
+      "flag_emoji": "🇺🇸",
+      "class": "Arleigh Burke Flight IIA",
+      "type": "Guided-missile Destroyer",
+      "mmsi": "338847000",
+      "imo": "0",
+      "callsign": "NOPA",
+      "ais_name": "WARSHIP",
+      "ais_status": "live",
+      "last_ais": {
+        "latitude": 35.510853,
+        "longitude": 24.22686,
+        "timestamp": "2026-03-22T18:49:00Z",
+        "speed_kn": 9.3,
+        "course": 59,
+        "heading": null,
+        "draught_m": null,
+        "nav_status": "Underway using Engine",
+        "destination": null,
+        "last_port": "Rota Spain",
+        "last_port_locode": "ESROT",
+        "atd": "2026-02-25T16:14:00Z",
+        "data_source": "Terrestrial"
+      },
+      "osint_assessment": {
+        "deployed_to": "Off Crete / Ford CSG",
+        "reported_by": "itamilradar.com",
+        "role": "BMD-capable Aegis destroyer, reportedly intercepted ballistic missile targeting Cyprus",
+        "notes": "Located off Crete near Evertsen. Departed Rota Feb 25. One of Ford CSG escorts."
+      }
+    },
+    {
+      "name": "HS Psara",
+      "hull_number": "F-454",
+      "flag": "Greece",
+      "flag_emoji": "🇬🇷",
+      "class": "Hydra (MEKO 200HN)",
+      "type": "Frigate",
+      "mmsi": "UNKNOWN",
+      "imo": "0",
+      "callsign": null,
+      "ais_name": null,
+      "ais_status": "dark",
+      "last_ais": null,
+      "osint_assessment": {
+        "deployed_to": "Cyprus",
+        "reported_by": "Greek Reporter, Army Recognition, Cyprus Mail, itamilradar.com",
+        "role": "Low-altitude counter-drone specialist (Centaur/Kentavros EW system)",
+        "notes": "Red Sea Aspides veteran. Crew has frontline experience neutralizing Iranian-design drones using EW jamming instead of expensive interceptors. Rotating out within days, likely replaced by HS Elli (F-450)."
+      }
+    },
+    {
+      "name": "HS Kimon",
+      "hull_number": "F-601",
+      "flag": "Greece",
+      "flag_emoji": "🇬🇷",
+      "class": "Kimon (Belharra/FDI)",
+      "type": "Frigate",
+      "mmsi": "237780180",
+      "imo": null,
+      "callsign": null,
+      "ais_name": null,
+      "ais_status": "dark",
+      "mmsi_source": "VesselFinder.com lookup",
+      "last_ais": null,
+      "osint_assessment": {
+        "deployed_to": "Cyprus",
+        "reported_by": "Greek Reporter, Naval Analyses, Greek City Times, Cyprus Mail",
+        "role": "High-altitude BMD (Sea Fire AESA radar + Aster 30 SAMs)",
+        "notes": "Most advanced Greek warship. Brand new — recently commissioned from Naval Group (France). Forms layered defence with Psara: Kimon handles high-alt ballistic threats, Psara handles low-alt drones. Greek PM Mitsotakis visited the ship off Cyprus. Rotating out within days."
+      }
+    }
+  ],
+  "analysis": {
+    "key_findings": [
+      "MMSI 247364500 is misattributed: belongs to ITS Luigi Rizzo (F595), NOT Federico Martinengo (F596). DataDocked API confirmed by returning 'NAVE LUIGI RIZZO'. Martinengo's actual MMSI remains unknown.",
+      "HNLMS De Zeven Provinciën (F802) is NOT deployed to Cyprus — last AIS in Baltic (Nov 2025). Infographics likely confuse it with sister ship Evertsen (F805).",
+      "Only 2 of 12 tracked warships are actively broadcasting AIS: Evertsen and Oscar Austin, both off Crete rather than Cyprus proper.",
+      "All ships reported operating directly around Cyprus are AIS-dark — standard wartime OPSEC.",
+      "Greek Navy systematically withholds MMSI from public databases. Kimon's MMSI (237780180) was found via VesselFinder — a rare catch for a brand-new ship.",
+      "Hellenic Navy deploying both Kimon and Psara creates a layered defence: Kimon (Aster 30) for high-altitude BMD, Psara (Centaur EW) for low-altitude drone swarms.",
+      "USS Gerald R. Ford's last AIS (off Morocco, Feb 18) is over 5 weeks stale — carrier is almost certainly now in E. Med based on OSINT reporting.",
+      "French carrier Charles de Gaulle has been AIS-dark since August 2018 — 8 years without public AIS broadcast."
+    ],
+    "ais_coverage_gap": "9 of 12 vessels are AIS-dark or severely stale. Real-time maritime domain awareness requires satellite AIS (Spire/Kpler) or SAR imagery (Sentinel-1) to fill gaps.",
+    "upcoming_rotation": "Greek frigates Kimon and Psara rotating out within days (as of Mar 27, 2026). HS Elli (F-450, Kortenaer-class) expected to replace. Continuous Greek naval presence confirmed by Defence Minister Dendias."
+  }
+}

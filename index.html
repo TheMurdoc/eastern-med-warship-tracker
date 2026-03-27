@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Eastern Med Warship Tracker — March 2026</title>
+<meta name="description" content="OSINT maritime tracker: NATO and allied warships deployed around Cyprus during the Iran-Israel-US conflict, March 2026. AIS + open source intelligence fusion.">
+<meta property="og:title" content="Eastern Med Warship Tracker — March 2026">
+<meta property="og:description" content="Interactive map tracking NATO warships defending Cyprus. AIS data fused with OSINT reporting. Includes EEZ boundaries, ship class silhouettes, and live/stale/dark AIS status.">
+<meta property="og:type" content="website">
+<meta property="og:image" content="https://upload.wikimedia.org/wikipedia/commons/thumb/3/37/Flag_of_NATO.svg/1200px-Flag_of_NATO.svg.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
+<style>
+*{box-sizing:border-box;}
+body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f5f5f3;color:#2C2C2A;}
+h1{font-size:18px;font-weight:500;margin:0 0 4px;}
+.sub{font-size:13px;color:#888;margin:0 0 12px;}
+#map{width:100%;height:78vh;min-height:520px;border-radius:12px;border:1px solid #ccc;}
+.legend{display:flex;flex-wrap:wrap;gap:14px;margin-top:12px;font-size:12px;color:#5F5E5A;align-items:center;}
+.legend span{display:flex;align-items:center;gap:5px;}
+.ldot{width:10px;height:10px;border-radius:50%;display:inline-block;border:1px solid rgba(0,0,0,0.15);}
+.lbox{width:10px;height:10px;display:inline-block;}
+.ship-wrap{position:relative;line-height:0;}
+.ais-pip{position:absolute;top:-3px;right:-3px;width:8px;height:8px;border-radius:50%;border:1.5px solid #fff;z-index:2;}
+.leaflet-popup-content{font-size:13px;line-height:1.55;min-width:240px;}
+.leaflet-popup-content b{font-size:14px;}
+.pp-row{display:flex;justify-content:space-between;padding:2px 0;border-bottom:1px solid #eee;}
+.pp-k{color:#888;font-size:12px;}
+.pp-v{font-size:12px;font-weight:500;text-align:right;}
+.pp-flag{font-size:16px;vertical-align:middle;margin-right:4px;}
+.credit{font-size:11px;color:#aaa;margin-top:8px;}
+.credit a{color:#888;}
+</style>
+</head>
+<body>
+<h1>Eastern Mediterranean warship tracker — March 2026</h1>
+<p class="sub">Cyprus defence deployment | Iran-Israel-US conflict | AIS + OSINT fusion | Top-down tactical view</p>
+<div id="map"></div>
+<div class="legend">
+  <span><span class="ldot" style="background:#1D9E75;"></span> AIS live</span>
+  <span><span class="ldot" style="background:#BA7517;"></span> AIS stale</span>
+  <span><span class="ldot" style="background:#E24B4A;"></span> AIS-dark</span>
+  <span><span class="lbox" style="border:2px dashed #378ADD;"></span> Cyprus box</span>
+  <span><span class="lbox" style="border:2px dashed #BA7517;"></span> Wide box</span>
+  <span><span class="lbox" style="border:1.5px solid #8B6FC0;opacity:0.6;"></span> EEZ</span>
+  <span style="margin-left:8px;border-left:1px solid #ccc;padding-left:8px;font-style:italic;">Bow → East</span>
+</div>
+<p class="credit">Data: VesselFinder AIS, itamilradar OSINT, MarineVesselTraffic | EEZ: <a href="https://marineregions.org">VLIZ MarineRegions</a> | Base: GEBCO</p>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script>
+var map=L.map('map',{scrollWheelZoom:true,dragging:true,zoomControl:true,doubleClickZoom:true,touchZoom:true,boxZoom:true,keyboard:true}).setView([35.0,30],6);
+
+var gebco=L.tileLayer('https://tiles.arcgis.com/tiles/C8EMgrsFcRFL6LrL/arcgis/rest/services/GEBCO_basemap_NCEI/MapServer/tile/{z}/{y}/{x}',{attribution:'GEBCO',maxZoom:12});
+var nautical=L.layerGroup([
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:18,opacity:0.5}),
+  L.tileLayer('https://tiles.openseamap.org/seamark/{z}/{x}/{y}.png',{maxZoom:18})
+]);
+var sat=L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',{maxZoom:18});
+var osm=L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:18});
+gebco.addTo(map);
+
+var eezLine=L.tileLayer.wms('https://geo.vliz.be/geoserver/MarineRegions/wms',{layers:'eez_boundaries',format:'image/png',transparent:true,opacity:0.6});
+var eezFill=L.tileLayer.wms('https://geo.vliz.be/geoserver/MarineRegions/wms',{layers:'eez',format:'image/png',transparent:true,opacity:0.1});
+eezFill.addTo(map); eezLine.addTo(map);
+
+L.control.layers(
+  {"Bathymetry":gebco,"Nautical":nautical,"Satellite":sat,"OSM":osm},
+  {"EEZ lines":eezLine,"EEZ fill":eezFill},
+  {position:'topright',collapsed:true}
+).addTo(map);
+L.control.scale({imperial:false}).addTo(map);
+
+L.polyline([[34,32],[36,32],[36,35.5],[34,35.5],[34,32]],{color:'#378ADD',weight:2,dashArray:'8,6',fill:true,fillColor:'#378ADD',fillOpacity:0.04}).addTo(map);
+L.polyline([[33.5,31],[36.5,31],[36.5,36.5],[33.5,36.5],[33.5,31]],{color:'#BA7517',weight:1.5,dashArray:'5,5',opacity:0.5}).addTo(map);
+
+/*
+  TOP-DOWN PLAN-VIEW SILHOUETTES
+  NATO tactical / wargame counter style
+  Bow faces RIGHT (east). All overhead outlines.
+  Each class has unique deck plan features visible from above.
+*/
+
+function svgCVN(fill,accent,w){
+  // Aircraft carrier - overhead: wide angled flight deck, island starboard, catapult lines
+  var h=Math.round(w*0.38);
+  return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 46" width="'+w+'" height="'+h+'">'
+    +'<defs><filter id="gs"><feDropShadow dx="1" dy="1" stdDeviation="1" flood-opacity="0.3"/></filter></defs>'
+    // flight deck outline - angled, wider than hull
+    +'<path d="M4,23 L20,6 L30,4 L100,2 L116,12 L118,23 L116,34 L100,44 L30,42 L20,40 Z" fill="'+fill+'" stroke="'+accent+'" stroke-width="1.4" filter="url(#gs)"/>'
+    // angled deck stripe
+    +'<line x1="40" y1="6" x2="80" y2="40" stroke="'+accent+'" stroke-width="1" opacity="0.5"/>'
+    +'<line x1="43" y1="6" x2="83" y2="40" stroke="'+accent+'" stroke-width="0.5" opacity="0.3"/>'
+    // catapult 1 (bow)
+    +'<line x1="65" y1="12" x2="110" y2="12" stroke="'+accent+'" stroke-width="0.8" opacity="0.6"/>'
+    // catapult 2
+    +'<line x1="65" y1="16" x2="108" y2="16" stroke="'+accent+'" stroke-width="0.8" opacity="0.6"/>'
+    // island (starboard bump)
+    +'<rect x="62" y="4" width="18" height="9" rx="2" fill="'+accent+'" opacity="0.45"/>'
+    // mast on island
+    +'<circle cx="71" cy="6" r="2" fill="'+accent+'" opacity="0.6"/>'
+    // elevator outlines
+    +'<rect x="88" y="28" width="10" height="8" rx="1" fill="none" stroke="'+accent+'" stroke-width="0.6" opacity="0.4"/>'
+    +'<rect x="46" y="28" width="10" height="8" rx="1" fill="none" stroke="'+accent+'" stroke-width="0.6" opacity="0.4"/>'
+    // aircraft parking (small crosses)
+    +'<g opacity="0.35" stroke="'+accent+'" stroke-width="0.8">'
+    +'<line x1="30" y1="18" x2="30" y2="24"/><line x1="27" y1="21" x2="33" y2="21"/>'
+    +'<line x1="38" y1="24" x2="38" y2="30"/><line x1="35" y1="27" x2="41" y2="27"/>'
+    +'<line x1="50" y1="16" x2="50" y2="22"/><line x1="47" y1="19" x2="53" y2="19"/>'
+    +'</g>'
+    // round-down aft
+    +'<path d="M8,18 Q4,23 8,28" fill="none" stroke="'+accent+'" stroke-width="0.6" opacity="0.4"/>'
+    +'</svg>';
+}
+
+function svgAegis(fill,accent,w){
+  // Aegis destroyer/frigate overhead: narrow hull, VLS hatches, SPY panels, gun turret circle
+  var h=Math.round(w*0.32);
+  return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 32" width="'+w+'" height="'+h+'">'
+    +'<defs><filter id="gs2"><feDropShadow dx="0.8" dy="0.8" stdDeviation="0.8" flood-opacity="0.25"/></filter></defs>'
+    // hull plan
+    +'<path d="M3,16 L14,4 L78,3 L97,10 L97,22 L78,29 L14,28 Z" fill="'+fill+'" stroke="'+accent+'" stroke-width="1.2" filter="url(#gs2)"/>'
+    // bow bulb
+    +'<ellipse cx="96" cy="16" rx="3" ry="4" fill="'+fill+'" stroke="'+accent+'" stroke-width="0.6" opacity="0.7"/>'
+    // main gun turret
+    +'<circle cx="86" cy="16" r="3.5" fill="'+accent+'" opacity="0.4"/>'
+    +'<line x1="86" y1="16" x2="93" y2="16" stroke="'+accent+'" stroke-width="1.4" opacity="0.5"/>'
+    // forward VLS (8x8 grid pattern)
+    +'<rect x="68" y="8" width="12" height="6" rx="1" fill="'+accent+'" opacity="0.2" stroke="'+accent+'" stroke-width="0.5"/>'
+    +'<rect x="68" y="18" width="12" height="6" rx="1" fill="'+accent+'" opacity="0.2" stroke="'+accent+'" stroke-width="0.5"/>'
+    // VLS cell lines
+    +'<g stroke="'+accent+'" stroke-width="0.3" opacity="0.3">'
+    +'<line x1="71" y1="8" x2="71" y2="14"/><line x1="74" y1="8" x2="74" y2="14"/><line x1="77" y1="8" x2="77" y2="14"/>'
+    +'<line x1="71" y1="18" x2="71" y2="24"/><line x1="74" y1="18" x2="74" y2="24"/><line x1="77" y1="18" x2="77" y2="24"/>'
+    +'</g>'
+    // superstructure (faceted)
+    +'<path d="M40,6 L56,6 L58,8 L58,24 L56,26 L40,26 L38,24 L38,8 Z" fill="'+accent+'" opacity="0.15" stroke="'+accent+'" stroke-width="0.5"/>'
+    // SPY-1 / APAR faces (4 panels)
+    +'<rect x="42" y="7" width="5" height="5" rx="0.5" fill="'+accent+'" opacity="0.35"/>'
+    +'<rect x="42" y="20" width="5" height="5" rx="0.5" fill="'+accent+'" opacity="0.35"/>'
+    +'<rect x="50" y="11" width="4" height="4" rx="0.5" fill="'+accent+'" opacity="0.3"/>'
+    +'<rect x="50" y="17" width="4" height="4" rx="0.5" fill="'+accent+'" opacity="0.3"/>'
+    // funnels (paired)
+    +'<rect x="34" y="9" width="3" height="3" rx="1" fill="'+accent+'" opacity="0.35"/>'
+    +'<rect x="34" y="20" width="3" height="3" rx="1" fill="'+accent+'" opacity="0.35"/>'
+    // SSM canisters (angled)
+    +'<rect x="60" y="7" width="5" height="2.5" rx="0.5" fill="'+accent+'" opacity="0.3" transform="rotate(-5,62,8)"/>'
+    +'<rect x="60" y="22.5" width="5" height="2.5" rx="0.5" fill="'+accent+'" opacity="0.3" transform="rotate(5,62,24)"/>'
+    // aft mast
+    +'<circle cx="28" cy="16" r="2" fill="'+accent+'" opacity="0.25"/>'
+    // helo deck (circle + H)
+    +'<rect x="6" y="7" width="16" height="18" rx="1.5" fill="'+accent+'" opacity="0.08" stroke="'+accent+'" stroke-width="0.5" stroke-dasharray="2,1.5"/>'
+    +'<circle cx="14" cy="16" r="5" fill="none" stroke="'+accent+'" stroke-width="0.5" opacity="0.4"/>'
+    +'<g stroke="'+accent+'" stroke-width="0.6" opacity="0.3"><line x1="12" y1="14" x2="12" y2="18"/><line x1="16" y1="14" x2="16" y2="18"/><line x1="12" y1="16" x2="16" y2="16"/></g>'
+    +'</svg>';
+}
+
+function svgFREMM(fill,accent,w){
+  // FREMM stealth frigate overhead: clean faceted lines, integrated mast
+  var h=Math.round(w*0.32);
+  return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 90 28" width="'+w+'" height="'+h+'">'
+    +'<defs><filter id="gs3"><feDropShadow dx="0.6" dy="0.6" stdDeviation="0.6" flood-opacity="0.25"/></filter></defs>'
+    // hull - sleek stealth facets
+    +'<path d="M3,14 L12,4 L72,3 L87,9 L87,19 L72,25 L12,24 Z" fill="'+fill+'" stroke="'+accent+'" stroke-width="1.1" filter="url(#gs3)"/>'
+    // bow sonar
+    +'<ellipse cx="86" cy="14" rx="2.5" ry="3.5" fill="'+fill+'" stroke="'+accent+'" stroke-width="0.5" opacity="0.6"/>'
+    // 76mm gun
+    +'<circle cx="78" cy="14" r="2.5" fill="'+accent+'" opacity="0.4"/>'
+    +'<line x1="78" y1="14" x2="84" y2="14" stroke="'+accent+'" stroke-width="1.2" opacity="0.5"/>'
+    // SYLVER VLS
+    +'<rect x="64" y="7" width="9" height="5" rx="0.5" fill="'+accent+'" opacity="0.2" stroke="'+accent+'" stroke-width="0.4"/>'
+    +'<rect x="64" y="16" width="9" height="5" rx="0.5" fill="'+accent+'" opacity="0.2" stroke="'+accent+'" stroke-width="0.4"/>'
+    // VLS hatch lines
+    +'<g stroke="'+accent+'" stroke-width="0.25" opacity="0.3">'
+    +'<line x1="67" y1="7" x2="67" y2="12"/><line x1="70" y1="7" x2="70" y2="12"/>'
+    +'<line x1="67" y1="16" x2="67" y2="21"/><line x1="70" y1="16" x2="70" y2="21"/>'
+    +'</g>'
+    // superstructure (stealth faceted)
+    +'<path d="M32,5 L50,5 L52,7 L52,21 L50,23 L32,23 L30,21 L30,7 Z" fill="'+accent+'" opacity="0.12" stroke="'+accent+'" stroke-width="0.5"/>'
+    // integrated mast (diamond from above)
+    +'<polygon points="41,4 44,7 41,10 38,7" fill="'+accent+'" opacity="0.4"/>'
+    // Exocet canisters
+    +'<rect x="54" y="6" width="6" height="2" rx="0.5" fill="'+accent+'" opacity="0.3"/>'
+    +'<rect x="54" y="20" width="6" height="2" rx="0.5" fill="'+accent+'" opacity="0.3"/>'
+    // low-profile exhausts
+    +'<path d="M36,6 L39,6 L38.5,8 L36.5,8 Z" fill="'+accent+'" opacity="0.3"/>'
+    +'<path d="M36,20" L39,20 L38.5,22 L36.5,22 Z" fill="'+accent+'" opacity="0.3"/>'
+    // aft structure
+    +'<rect x="22" y="8" width="5" height="12" rx="1" fill="'+accent+'" opacity="0.1"/>'
+    // helo deck
+    +'<rect x="5" y="6" width="14" height="16" rx="1.5" fill="'+accent+'" opacity="0.07" stroke="'+accent+'" stroke-width="0.4" stroke-dasharray="2,1.5"/>'
+    +'<circle cx="12" cy="14" r="4" fill="none" stroke="'+accent+'" stroke-width="0.4" opacity="0.35"/>'
+    +'<g stroke="'+accent+'" stroke-width="0.5" opacity="0.25"><line x1="10.5" y1="12.5" x2="10.5" y2="15.5"/><line x1="13.5" y1="12.5" x2="13.5" y2="15.5"/><line x1="10.5" y1="14" x2="13.5" y2="14"/></g>'
+    +'</svg>';
+}
+
+function svgMEKO(fill,accent,w){
+  // MEKO 200 overhead: chunkier, lattice mast, classic layout
+  var h=Math.round(w*0.35);
+  return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 28" width="'+w+'" height="'+h+'">'
+    +'<defs><filter id="gs4"><feDropShadow dx="0.6" dy="0.6" stdDeviation="0.6" flood-opacity="0.25"/></filter></defs>'
+    // hull - wider beam, less stealth
+    +'<path d="M3,14 L10,4 L62,3 L77,9 L77,19 L62,25 L10,24 Z" fill="'+fill+'" stroke="'+accent+'" stroke-width="1.1" filter="url(#gs4)"/>'
+    // 127mm gun
+    +'<circle cx="68" cy="14" r="3" fill="'+accent+'" opacity="0.4"/>'
+    +'<line x1="68" y1="14" x2="75" y2="14" stroke="'+accent+'" stroke-width="1.3" opacity="0.5"/>'
+    // Sea Sparrow launcher
+    +'<rect x="56" y="8" width="7" height="5" rx="1" fill="'+accent+'" opacity="0.25" stroke="'+accent+'" stroke-width="0.4"/>'
+    +'<rect x="56" y="15" width="7" height="5" rx="1" fill="'+accent+'" opacity="0.25" stroke="'+accent+'" stroke-width="0.4"/>'
+    // superstructure block (rectangular, less stealth)
+    +'<rect x="30" y="6" width="16" height="16" rx="1.5" fill="'+accent+'" opacity="0.15" stroke="'+accent+'" stroke-width="0.5"/>'
+    // lattice mast (X from above)
+    +'<g stroke="'+accent+'" stroke-width="0.8" opacity="0.4">'
+    +'<line x1="35" y1="7" x2="43" y2="13"/><line x1="43" y1="7" x2="35" y2="13"/>'
+    +'</g>'
+    // radar dome
+    +'<circle cx="39" cy="10" r="2" fill="'+accent+'" opacity="0.3"/>'
+    // Harpoon SSM
+    +'<rect x="48" y="7" width="5" height="2" rx="0.5" fill="'+accent+'" opacity="0.3"/>'
+    +'<rect x="48" y="19" width="5" height="2" rx="0.5" fill="'+accent+'" opacity="0.3"/>'
+    // funnels
+    +'<rect x="26" y="8" width="3" height="3" rx="1" fill="'+accent+'" opacity="0.35"/>'
+    +'<rect x="26" y="17" width="3" height="3" rx="1" fill="'+accent+'" opacity="0.35"/>'
+    // torpedo tubes
+    +'<line x1="50" y1="6" x2="54" y2="4" stroke="'+accent+'" stroke-width="0.8" opacity="0.3"/>'
+    +'<line x1="50" y1="22" x2="54" y2="24" stroke="'+accent+'" stroke-width="0.8" opacity="0.3"/>'
+    // helo deck
+    +'<rect x="5" y="6" width="12" height="16" rx="1.5" fill="'+accent+'" opacity="0.07" stroke="'+accent+'" stroke-width="0.4" stroke-dasharray="2,1.5"/>'
+    +'<circle cx="11" cy="14" r="4" fill="none" stroke="'+accent+'" stroke-width="0.4" opacity="0.35"/>'
+    +'</svg>';
+}
+
+function svgType45(fillTop,fillBot,accent,w){
+  // Type 45 overhead: split hull colour, SAMPSON dome prominent
+  var h=Math.round(w*0.32);
+  return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 30" width="'+w+'" height="'+h+'">'
+    +'<defs><filter id="gs5"><feDropShadow dx="0.7" dy="0.7" stdDeviation="0.7" flood-opacity="0.25"/></filter></defs>'
+    // hull top half
+    +'<path d="M93,15 L82,4 L14,3 L3,10 L3,15 Z" fill="'+fillTop+'" stroke="'+accent+'" stroke-width="1.1" filter="url(#gs5)"/>'
+    // hull bottom half
+    +'<path d="M3,15 L3,20 L14,27 L82,26 L93,15 Z" fill="'+fillBot+'" stroke="'+accent+'" stroke-width="1.1"/>'
+    // centerline
+    +'<line x1="5" y1="15" x2="91" y2="15" stroke="'+accent+'" stroke-width="0.3" opacity="0.2"/>'
+    // 4.5" gun
+    +'<circle cx="85" cy="15" r="3" fill="'+accent+'" opacity="0.4"/>'
+    +'<line x1="85" y1="15" x2="92" y2="15" stroke="'+accent+'" stroke-width="1.3" opacity="0.5"/>'
+    // Sea Viper VLS (48 cells)
+    +'<rect x="70" y="7" width="10" height="6" rx="0.5" fill="'+accent+'" opacity="0.2" stroke="'+accent+'" stroke-width="0.5"/>'
+    +'<rect x="70" y="17" width="10" height="6" rx="0.5" fill="'+accent+'" opacity="0.2" stroke="'+accent+'" stroke-width="0.5"/>'
+    +'<g stroke="'+accent+'" stroke-width="0.25" opacity="0.25">'
+    +'<line x1="73" y1="7" x2="73" y2="13"/><line x1="76" y1="7" x2="76" y2="13"/>'
+    +'<line x1="73" y1="17" x2="73" y2="23"/><line x1="76" y1="17" x2="76" y2="23"/>'
+    +'</g>'
+    // faceted superstructure
+    +'<path d="M36,5 L56,5 L58,8 L58,22 L56,25 L36,25 L34,22 L34,8 Z" fill="'+accent+'" opacity="0.12" stroke="'+accent+'" stroke-width="0.5"/>'
+    // SAMPSON radome (prominent golf ball — signature feature)
+    +'<circle cx="47" cy="4" r="3.5" fill="'+accent+'" opacity="0.45" stroke="'+accent+'" stroke-width="0.6"/>'
+    +'<circle cx="47" cy="4" r="1.5" fill="'+accent+'" opacity="0.2"/>'
+    // S1850M (aft rectangular panel)
+    +'<rect x="26" y="6" width="4" height="6" rx="0.5" fill="'+accent+'" opacity="0.35"/>'
+    // exhausts (IR suppressed)
+    +'<path d="M40" y1="6" L43,6 L42.5,9 L40.5,9 Z" fill="'+accent+'" opacity="0.2"/>'
+    +'<path d="M40,21 L43,21 L42.5,24 L40.5,24 Z" fill="'+accent+'" opacity="0.2"/>'
+    // Phalanx CIWS
+    +'<circle cx="62" cy="7" r="1.8" fill="'+accent+'" opacity="0.3"/>'
+    +'<circle cx="62" cy="23" r="1.8" fill="'+accent+'" opacity="0.3"/>'
+    // helo deck
+    +'<rect x="6" y="7" width="16" height="16" rx="1.5" fill="'+accent+'" opacity="0.07" stroke="'+accent+'" stroke-width="0.5" stroke-dasharray="2,1.5"/>'
+    +'<circle cx="14" cy="15" r="5" fill="none" stroke="'+accent+'" stroke-width="0.5" opacity="0.35"/>'
+    +'<g stroke="'+accent+'" stroke-width="0.5" opacity="0.25"><line x1="12.5" y1="13.5" x2="12.5" y2="16.5"/><line x1="15.5" y1="13.5" x2="15.5" y2="16.5"/><line x1="12.5" y1="15" x2="15.5" y2="15"/></g>'
+    +'</svg>';
+}
+
+function svgBW(fill,accent,w){
+  // Baden-Württemberg: massive 7200t, double helo, boxy overhead
+  var h=Math.round(w*0.3);
+  return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 110 34" width="'+w+'" height="'+h+'">'
+    +'<defs><filter id="gs6"><feDropShadow dx="0.8" dy="0.8" stdDeviation="0.8" flood-opacity="0.25"/></filter></defs>'
+    // hull - wide beam
+    +'<path d="M3,17 L14,4 L88,3 L107,10 L107,24 L88,31 L14,30 Z" fill="'+fill+'" stroke="'+accent+'" stroke-width="1.2" filter="url(#gs6)"/>'
+    // 127mm gun
+    +'<circle cx="98" cy="17" r="3.5" fill="'+accent+'" opacity="0.4"/>'
+    +'<line x1="98" y1="17" x2="106" y2="17" stroke="'+accent+'" stroke-width="1.4" opacity="0.5"/>'
+    // RAM launchers
+    +'<circle cx="88" cy="7" r="2.5" fill="'+accent+'" opacity="0.35"/>'
+    +'<circle cx="88" cy="27" r="2.5" fill="'+accent+'" opacity="0.35"/>'
+    // RBS-15 canisters
+    +'<rect x="76" y="6" width="6" height="2.5" rx="0.5" fill="'+accent+'" opacity="0.3"/>'
+    +'<rect x="76" y="25.5" width="6" height="2.5" rx="0.5" fill="'+accent+'" opacity="0.3"/>'
+    // large superstructure
+    +'<rect x="42" y="6" width="22" height="22" rx="2" fill="'+accent+'" opacity="0.15" stroke="'+accent+'" stroke-width="0.5"/>'
+    // TRS-4D mast (pyramid from above)
+    +'<polygon points="53,4 57,8 53,12 49,8" fill="'+accent+'" opacity="0.4"/>'
+    // radar panels on superstructure
+    +'<rect x="45" y="8" width="4" height="4" fill="'+accent+'" opacity="0.3"/>'
+    +'<rect x="45" y="22" width="4" height="4" fill="'+accent+'" opacity="0.3"/>'
+    // funnels
+    +'<rect x="38" y="9" width="3" height="4" rx="1" fill="'+accent+'" opacity="0.35"/>'
+    +'<rect x="38" y="21" width="3" height="4" rx="1" fill="'+accent+'" opacity="0.35"/>'
+    // MLG 27 positions
+    +'<circle cx="70" cy="6" r="1.5" fill="'+accent+'" opacity="0.25"/>'
+    +'<circle cx="70" cy="28" r="1.5" fill="'+accent+'" opacity="0.25"/>'
+    // aft structure
+    +'<rect x="22" y="8" width="10" height="18" rx="1" fill="'+accent+'" opacity="0.1"/>'
+    // DOUBLE helo deck (signature feature)
+    +'<rect x="4" y="5" width="22" height="24" rx="2" fill="'+accent+'" opacity="0.07" stroke="'+accent+'" stroke-width="0.5" stroke-dasharray="2,1.5"/>'
+    +'<circle cx="10" cy="12" r="3.5" fill="none" stroke="'+accent+'" stroke-width="0.4" opacity="0.35"/>'
+    +'<circle cx="10" cy="22" r="3.5" fill="none" stroke="'+accent+'" stroke-width="0.4" opacity="0.35"/>'
+    +'<line x1="4" y1="17" x2="26" y2="17" stroke="'+accent+'" stroke-width="0.3" opacity="0.3" stroke-dasharray="2,2"/>'
+    +'</svg>';
+}
+
+/* ── Ship placement ── */
+function mkShip(lat,lng,svgStr,w,h,aisColor,name,popup){
+  var icon=L.divIcon({
+    className:'ship-wrap',
+    html:svgStr+'<div class="ais-pip" style="background:'+aisColor+';"></div>',
+    iconSize:[w,h],iconAnchor:[w/2,h/2],popupAnchor:[0,-h/2-6]
+  });
+  var m=L.marker([lat,lng],{icon:icon,interactive:true,zIndexOffset:aisColor==='#1D9E75'?1000:500}).addTo(map);
+  m.bindPopup(popup,{maxWidth:360});
+  m.bindTooltip(name,{permanent:false,direction:'top',offset:[0,-h/2-6]});
+  return m;
+}
+
+function pp(flag,name,rows){
+  var s='<div><span class="pp-flag">'+flag+'</span><b>'+name+'</b></div><div style="margin-top:6px;">';
+  rows.forEach(function(r){s+='<div class="pp-row"><span class="pp-k">'+r[0]+'</span><span class="pp-v">'+r[1]+'</span></div>';});
+  return s+'</div>';
+}
+
+var G='#1D9E75',A='#BA7517',D='#E24B4A';
+
+// sizes
+var CVN_W=62, AEGIS_W=40, FREMM_W=34, MEKO_W=28, T45_W=40, BW_W=42;
+
+// ── AIS LIVE ──
+mkShip(35.500168,24.192955,svgAegis('#FF6600','#fff',AEGIS_W),AEGIS_W,Math.round(AEGIS_W*0.32),G,'HNLMS Evertsen (F805)',
+  pp('\ud83c\uddf3\ud83c\uddf1','HNLMS Evertsen (F805)',[['MMSI','244942000'],['IMO','4601022'],['Position','35.50\u00b0N, 24.19\u00b0E'],['AIS','Mar 27 15:05 UTC'],['Speed','6.1 kn / 030\u00b0'],['From','Valletta'],['Class','De Zeven Provincien LCF'],['Role','Air-defence, CdG CSG']]));
+
+mkShip(35.510853,24.22686,svgAegis('#002868','#BF0A30',34),34,Math.round(34*0.32),G,'USS Oscar Austin (DDG-79)',
+  pp('\ud83c\uddfa\ud83c\uddf8','USS Oscar Austin (DDG-79)',[['MMSI','338847000'],['Position','35.51\u00b0N, 24.23\u00b0E'],['AIS','Mar 22 18:49 UTC'],['Speed','9.3 kn'],['From','Rota'],['Class','Arleigh Burke IIA'],['Role','BMD Aegis']]));
+
+// ── AIS STALE ──
+mkShip(33.652843,-12.003232,svgCVN('#002868','#BF0A30',CVN_W),CVN_W,Math.round(CVN_W*0.38),A,'USS Gerald R. Ford (CVN-78)',
+  pp('\ud83c\uddfa\ud83c\uddf8','USS Gerald R. Ford (CVN-78)',[['MMSI','338803000'],['Last pos','33.65\u00b0N, 12.00\u00b0W'],['AIS','Feb 18 \u2014 STALE'],['Speed','18.2 kn'],['Class','Ford-class CVN'],['Assessment','Likely now in E. Med']]));
+
+mkShip(43.0439,5.9569,svgFREMM('#002654','#ED2939',26),26,Math.round(26*0.32),A,'FS Languedoc (D653) [last AIS]',
+  pp('\ud83c\uddeb\ud83c\uddf7','FS Languedoc (D653)',[['MMSI','227999300'],['Last pos','Toulon'],['AIS','Oct 2025 \u2014 STALE'],['Class','Aquitaine FREMM ASW']]));
+
+mkShip(43.11372,5.902113,svgCVN('#002654','#ED2939',56),56,Math.round(56*0.38),A,'Charles de Gaulle (R91) [last AIS]',
+  pp('\ud83c\uddeb\ud83c\uddf7','Charles de Gaulle (R91)',[['MMSI','228711555'],['Last pos','Toulon'],['AIS','Aug 2018 \u2014 ANCIENT'],['Class','Nuclear CVN'],['Air wing','Rafale M + E-2C']]));
+
+mkShip(59.252468,19.733866,svgAegis('#FF6600','#fff',36),36,Math.round(36*0.32),A,'HNLMS De Zeven Provincien (F802)',
+  pp('\ud83c\uddf3\ud83c\uddf1','De Zeven Provincien (F802)',[['MMSI','244911000'],['Last pos','Baltic'],['AIS','Nov 2025 \u2014 STALE'],['Note','NOT near Cyprus']]));
+
+// ── AIS-DARK ──
+mkShip(34.95,33.8,svgFREMM('#0D5EAF','#fff',FREMM_W),FREMM_W,Math.round(FREMM_W*0.32),D,'HS Kimon (F-601)',
+  pp('\ud83c\uddec\ud83c\uddf7','HS Kimon (F-601)',[['MMSI','237780180'],['Status','AIS-DARK'],['Class','Kimon/Belharra FDI'],['Radar','Sea Fire AESA'],['Arms','Aster 15/30'],['Role','High-alt BMD']]));
+
+mkShip(34.65,33.2,svgMEKO('#0D5EAF','#fff',MEKO_W),MEKO_W,Math.round(MEKO_W*0.35),D,'HS Psara (F-454)',
+  pp('\ud83c\uddec\ud83c\uddf7','HS Psara (F-454)',[['MMSI','unknown'],['Status','AIS-DARK'],['Class','Hydra MEKO 200HN'],['EW','Centaur counter-drone'],['Role','Low-alt drone kill']]));
+
+mkShip(35.1,34.2,svgAegis('#AA151B','#F1BF00',AEGIS_W),AEGIS_W,Math.round(AEGIS_W*0.32),D,'SPS Cristobal Colon (F-105)',
+  pp('\ud83c\uddea\ud83c\uddf8','SPS Cristobal Colon (F-105)',[['MMSI','225920870'],['Status','AIS-DARK'],['Class','Alvaro de Bazan (Aegis)'],['Radar','SPY-1D'],['Role','CdG CSG escort']]));
+
+mkShip(34.5,33.9,svgFREMM('#008C45','#fff',30),30,Math.round(30*0.32),D,'ITS Martinengo (F596)',
+  pp('\ud83c\uddee\ud83c\uddf9','ITS Federico Martinengo (F596)',[['IMO','4714049'],['MMSI','UNKNOWN'],['Note','247364500 = Luigi Rizzo!'],['Status','AIS-DARK'],['Class','Bergamini FREMM GP'],['Arrived','Mar 11']]));
+
+mkShip(34.3,32.5,svgType45('#012169','#C8102E','#fff',T45_W),T45_W,Math.round(T45_W*0.32),D,'HMS Dragon (D35)',
+  pp('\ud83c\uddec\ud83c\udde7','HMS Dragon (D35)',[['MMSI','235053408'],['IMO','4907866'],['Status','AIS-DARK'],['Class','Type 45 Daring'],['Radar','SAMPSON AESA'],['Arms','Sea Viper / Aster 30']]));
+
+mkShip(34.1,33.6,svgBW('#1a1a1a','#DD0000',BW_W),BW_W,Math.round(BW_W*0.3),D,'FGS NRW (F223)',
+  pp('\ud83c\udde9\ud83c\uddea','FGS Nordrhein-Westfalen (F223)',[['MMSI','211921000'],['Status','AIS-DARK off Lebanon'],['Class','Baden-W\u00fcrttemberg'],['Displ.','7,200t'],['Mission','UNIFIL MTF']]));
+
+mkShip(35.3,33.0,svgFREMM('#002654','#ED2939',28),28,Math.round(28*0.32),D,'FS Languedoc (D653) [ops]',
+  pp('\ud83c\uddeb\ud83c\uddf7','FS Languedoc (D653) \u2014 ops area',[['MMSI','227999300'],['Status','AIS-DARK near Cyprus'],['Class','Aquitaine FREMM ASW'],['Arms','Aster 15 + Exocet']]));
+
+// EEZ labels
+[
+  [35.0,33.3,'Cyprus'],[36.8,26.5,'Greece'],[37.2,31.5,'T\u00fcrkiye'],
+  [31.5,30.0,'Egypt'],[34.2,35.6,'Lebanon'],[32.5,34.0,'Israel'],
+  [35.3,35.8,'Syria'],[33.0,18.0,'Libya']
+].forEach(function(e){
+  L.marker([e[0],e[1]],{icon:L.divIcon({className:'',html:'<div style="font-size:11px;font-weight:500;color:#534AB7;text-shadow:1px 1px 2px rgba(255,255,255,0.85),-1px -1px 2px rgba(255,255,255,0.85);white-space:nowrap;pointer-events:none;">'+e[2]+'</div>',iconSize:[70,14],iconAnchor:[35,7]}),interactive:false}).addTo(map);
+});
+</script>
+</body>
+</html>
