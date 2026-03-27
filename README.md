@@ -2,7 +2,7 @@
 
 **OSINT maritime intelligence: NATO and allied warships deployed around Cyprus during the Iran-Israel-US conflict.**
 
-🔗 **[Live Interactive Map](https://yourusername.github.io/eastern-med-warship-tracker/index.html)** ← *Update this URL after enabling GitHub Pages*
+🔗 **[Live Interactive Map](https://themurdoc.github.io/eastern-med-warship-tracker/index.html)** ← *Update this URL after enabling GitHub Pages*
 
 ![Status](https://img.shields.io/badge/status-active_monitoring-brightgreen)
 ![Data](https://img.shields.io/badge/data-AIS_%2B_OSINT_fusion-blue)
